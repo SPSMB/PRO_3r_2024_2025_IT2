@@ -31,6 +31,12 @@ int main(void){
 	printf("Kontrola: %d\n", kontrola);
 	printf("K: %d, L: %d\n", k, l);
 
+	if(kontrola != 2){
+		printf("Neco se nepovedlo.\n");
+		// cisteni vstupu
+		while(getchar() != '\n');
+	}
+
 	printf("Z: %d", z);
 
 
