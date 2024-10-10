@@ -25,7 +25,7 @@ int main(void){
 	scanf_s("%d", &cas);
 	printf("Zadejte typ vaseho uctu: ");
 	//while(getchar()!='\n');
-	scanf(" %c", &typ);
+	scanf_s(" %c", &typ, 1);
 
 	if(typ == 'A'){
 		if(	(zustatek > 10000) && (zustatek < 250000) && (cas > 2)){
