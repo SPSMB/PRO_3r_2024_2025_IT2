@@ -7,15 +7,17 @@ int main(void){
 	printf("Zadej velikost: ");
 	scanf("%d", &velikost);
 
-	for(int i = 0 ;i < velikost; i++){
+	// kdyz i*2 > velikost, tak mame zlom
+	int i = 0;
+	for(;i*2 < velikost; i++){
+		for(int j = 0; j < i; j++) printf(" ");	
 		
-		// kdyz i*2 > velikost, tak mame zlom
+		printf("%d\n", i);
+	}
 
-		for(int j=0; j < i; j++){
+	for(;i < velikost; i++){
+		for(int k = i;k<velikost-1;k++)	printf(" ");	
 		
-			printf(" ");
-		
-		}
 		printf("%d\n", i);
 	}
 
