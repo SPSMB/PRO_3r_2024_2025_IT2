@@ -1,6 +1,27 @@
 #include "stdio.h"
 #pragma warning(disable:4996)
 
+int faktorial(int a);
+int kombinacniCislo(int dolni, int horni);
+
+
+int main(void)
+{
+	int n;	// horni cast kombin. cisla
+	int k;	// dolni cast komb. cisla
+
+	printf("Zadejte horni cast: ");
+	scanf("%d", &n);
+	printf("Zadejte dolni cast: ");
+	scanf("%d", &k);
+
+	int kombCislo = kombinacniCislo(k, n);
+	printf("vysledek: %d", kombCislo);
+	
+	return 0;
+}
+
+// -------------
 
 int faktorial(int a){
 
@@ -11,16 +32,10 @@ int faktorial(int a){
 	return vysledek;
 }
 
-int main(void)
-{
-	int n,k;
-	printf("Zadejte horni cast: ");
-	scanf("%d", &n);
-	printf("Zadejte dolni cast: ");
-	scanf("%d", &k);
-
-	int kombCislo = faktorial(n)/(faktorial(k)*faktorial(n-k));
-	printf("vysledek: %d", kombCislo);
-	
-	return 0;
+// -------------
+// Funkce pocita kombinancni cislo
+// (n)
+// (k)
+int kombinacniCislo(int dolni, int horni){
+	return faktorial(horni)/(faktorial(dolni)*faktorial(horni-dolni));
 }
