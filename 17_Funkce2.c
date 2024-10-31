@@ -15,7 +15,7 @@ int main(void)
 	printf("Zadejte 2 cisla: ");
 	scanf("%d %d", &x, &y);
 
-	int vysledek = nasob(x, y, vysledek);
+	nasob(x, y, vysledek);
 
 	printf("Vysledek nasobeni: %d", vysledek);
 
