@@ -4,8 +4,16 @@
 
 int compare(const void* a, const void* b) {
       
-      // If a is smaller, positive value will be returned
-    return (*(float*)a - *(float*)b);
+    // If a is smaller, positive value will be returned
+    if(*(float*)a - *(float*)b < 0){
+    	return 1;
+    } else if(*(float*)a - *(float*)b > 0){
+	return -1;
+    } else {
+    	return 0;
+    }
+
+    //return (*(float*)a - *(float*)b);
 }
 
 
@@ -26,17 +34,23 @@ int main(void)
 	
 	for (int i = 0; i < velikost ; i++)
 	{
-		printf("%.2lf\n", teploty[i]);
 		prumer += teploty[i];
 	}
 
 	prumer = prumer/velikost;
 
-	printf("prumer teplot: %f" ,prumer);
+	printf("prumer teplot: %.2f\n" ,prumer);
 
 	qsort(teploty, velikost, sizeof(float), compare);
 
-	
+	printf("Serazene pole: ");
+	for(int j=0 ; j<velikost; j++){
+		printf("%.1lf ", teploty[j]);
+	}
+	printf("\n");
+
+	printf("Minimum je: %.2f\n", teploty[velikost-1]);
+	printf("Maximum je: %.2f\n", teploty[0]);
 
 
 
