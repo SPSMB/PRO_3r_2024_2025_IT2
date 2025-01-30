@@ -14,21 +14,23 @@ int main(){
 	printf("Kolik cisel chcete zadat? ");
 	scanf("%d", &velikost);
 
-	int * poleCisel = (int *) malloc(velikost * sizeof(int));
+	int * poleCisel = (int *) calloc(velikost, sizeof(int));
 
+	/*
 	printf("Zadejte cisla, oddelujte mezerami:\n");
 	for(int i=0; i<velikost; i++){
 		scanf("%d", &poleCisel[i]);
 	}
-
+	*/
+	
 	int hledam;
 	printf("Jake cislo chcete vyhledat? ");
 	scanf("%d", &hledam);
 
 	int citac = 0;
 	for(int j=0; j<velikost; j++){
-		printf("Hledam: %d, ", hledam);
-		printf("J:%d Hodnota:%d\n", j, poleCisel[j]);
+		//printf("Hledam: %d, ", hledam);
+		//printf("J:%d Hodnota:%d\n", j, poleCisel[j]);
 		if(poleCisel[j] == hledam){
 			citac++;
 		}
@@ -37,6 +39,9 @@ int main(){
 	printf("Hledane cislo %d se v poli nachazi %dx.\n",
 		hledam, citac);
 
+	int n;
+	printf("Pro ukonceni programu zadejte jakekoliv cislo: ");
+	scanf("%d", &n);
 	
 	return 0;
 }
