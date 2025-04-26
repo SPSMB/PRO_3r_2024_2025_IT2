@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 // potlaci warning o zastarale funkci (scanf apod)
 #pragma warning(disable:4996)
@@ -24,22 +25,39 @@ int pocetRadku(const char * jmenoSouboru){
 	return counter;
 }
 
-void nacti1Radek(FILE * soubor, int * radek, int pSloupcu){
-	for(int s = 0; s < pSloupcu; s++){
-		if(s == pSloupcu-1){
-			fscanf(soubor, "%d", &(radek[s]));
-		} else {
-			fscanf(soubor, "%d;", &radek[s]);
+// vraci 1, kdyz je radek vadny, jinak 0
+int nacti1Radek(FILE * soubor, int * radek){
+	
+	char radekTMP[20];
+	fgets(radekTMP, 20, soubor);
+	int delkaradku = strlen(radekTMP);
+	printf("Delka radku: %d\n", delkaradku);
+
+	if(delkaradku >= 8){
+		char * token = strtok(radekTMP, ";");
+		int s = 0;
+		while(token != NULL){
+			//printf(" token = %s\n", token);
+			radek[s] = atoi(token);
+			token = strtok(NULL, ";");
+			s++;
 		}
+	} else {
+		printf("Delka radku je %d, preskakuji.\n", delkaradku);
+		return 1;
 	}
+	return 0;
 }
 
-void nactiDataZeSouboru(const char * nazev, int ** tabulka, int pRadku, int pSloupcu){
+void nactiDataZeSouboru(const char * nazev, int ** tabulka, int * pRadku){
 	FILE * soubor = fopen(nazev, "r");
-	for(int r = 0; r<pRadku; r++){
-		nacti1Radek(soubor, tabulka[r], pSloupcu);
+	int chybneRadky = 0;
+	for(int r = 0; r<*pRadku; r++){
+		chybneRadky += nacti1Radek(soubor, tabulka[r]);
+		//chybneRadky += nacti1Radek(soubor, tabulka[r-chybneRadky]);
 	}
 	fclose(soubor);
+	*pRadku = *pRadku - chybneRadky;
 }
 
 void vypis2DPole(int ** tabulka, int pRadku, int pSloupcu){
@@ -71,7 +89,8 @@ int main(int argc, char ** argv){
 		tabulka[i] = (int *) malloc(pSloupcu * sizeof(int));
 	}
 	
-	nactiDataZeSouboru(argv[1], tabulka, pRadku, pSloupcu);
+	nactiDataZeSouboru(argv[1], tabulka, &pRadku);
+	printf("Po nacteni dat mam %d platnych radku.\n", pRadku);
 	vypis2DPole(tabulka, pRadku, pSloupcu);
 
 	// uvolneni pameti - radky
