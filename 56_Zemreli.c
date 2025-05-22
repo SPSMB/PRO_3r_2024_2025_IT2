@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define DELKA 300
+
 // potlaci warning o zastarale funkci (scanf apod)
 #pragma warning(disable:4996)
 
@@ -73,6 +75,33 @@ void uvolniPamet(int ** hodnota, int ** rok, int ** tyden,
 	
 }
 
+void zpracujRadek(char radek[DELKA], int cRadku, int * hodnota, int * rok, int * tyden, 
+	char ** cas_od, char ** cas_do, char ** vek_txt){
+	char tmp[12];
+	int i = 0; /* index do pole radek */
+	int t = 0; /* index do pole tmp */
+	int s = 0; /* pocitadlo sloupcu */
+
+	for(; s<=12; i++){
+		if(radek[i] == ','){
+			tmp[t] = '\0'; // ukoncuji retezec
+			if(s == 1) hodnota[cRadku] = atoi(tmp);
+			if(s == 7) rok[cRadku] = atoi(tmp);
+			if(s == 8) tyden[cRadku] = atoi(tmp);
+			if(s == 10) strncpy(cas_od[cRadku], tmp, 12);
+			if(s == 11) strncpy(cas_do[cRadku], tmp, 12);
+			if(s == 12) strncpy(vek_txt[cRadku], tmp, 12);
+			t = 0; // reset ukazatele do tmp
+			s++; // zvysuji index sloupce
+		} else if(radek[i] == '"'){
+			continue;
+		} else if(s==1 || s==7 || s==8 || s==10 || s==11 || s==12){
+			tmp[t]=radek[i];
+			t++;
+		}
+	}
+}
+
 int main(int argc, char ** argv){
 
 	if(argc != 2){
@@ -87,6 +116,16 @@ int main(int argc, char ** argv){
 	int pRadku = pocetRadku(argv[1]);
 	alokujPamet(&hodnota, &rok, &tyden, &cas_od, &cas_do, &vek_txt, pRadku);
 	
+	char buf[DELKA];
+	FILE * f = otevriSoubor(argv[1], "r");
+	fscanf(f, "%*[^\n]\n");
+
+	for(int i=1; fgets(buf, DELKA, f) && i<pRadku ; i++){
+		zpracujRadek(buf, i, hodnota, rok, tyden, cas_od, cas_do, vek_txt);
+		printf("%d, %d, %d, %s, %s, %s\n", rok[i], tyden[i], hodnota[i], vek_txt[i], cas_od[i], cas_do[i]);
+	}
+	fclose(f);
+
 	uvolniPamet(&hodnota, &rok, &tyden, &cas_od, &cas_do, &vek_txt, pRadku);
 	printf("Program konci\n");
 	return 0;
