@@ -14,25 +14,76 @@ typedef struct zaznam {
 	char vek_txt[D_TEXT];
 } Zaznam;
 
+typedef struct statistiky {
+	int soucet;
+	int prumer;
+} Statistiky;
+
 // potlaci warning o zastarale funkci (scanf apod)
 #pragma warning(disable:4996)
 
-void filtr( Zaznam * db, int vel, char * kat, char * dat1, char * dat2){
+
+// funkce filtr vypisuje vsechny polozky databaze, ktere splnuji zadane podminky
+// parametry:
+//  - db - pole zaznamu, ktere mam v databazi
+//  - vel - velikost pole *db
+//  - kat - vekova kategorie, kterou zadal uzivatel
+//  - dat1 - datum od kdy chce uzivatel filtrovat
+//  - dat2 - datum do kdy chce uzivatel filtrovat
+//  - vypis - kdyz je 1, vypisuji, kdyz je 0, nevypisuji
+void filtr( Zaznam * db, int vel, char * kat, char * dat1, char * dat2, int vypis, Statistiky * stat){
+
 
 	int counter = 0;
+	int soucet = 0;
+	if(vypis) printf("|ID   |Rok  |Tyden|Hodn.|Kategorie |Datum od  |Datum do  |\n");
+	if(vypis) printf("----------------------------------------------------------\n");
 	for(int i=0;  i < vel ; i++){
 		if(kat[0] == db[i].vek_txt[0] && 
 			kat[1] == db[i].vek_txt[1] &&
 			strcmp(db[i].cas_do, dat1) >= 0 &&
 			strcmp(db[i].cas_od, dat2) <= 0){
+			if (counter%15 == 0){
+				if(vypis) printf("|ID   |Rok  |Tyden|Hodn.|Kategorie |Datum od  |Datum do  |\n");
+			}
 
-			printf("|%5d|%5d|%5d|%5d|%10s|%10s|%10s|\n", 
+			if(vypis) printf("|%5d|%5d|%5d|%5d|%10s|%10s|%10s|\n", 
 				i, db[i].rok, db[i].tyden, db[i].hodnota, 
 				db[i].vek_txt, db[i].cas_od, db[i].cas_do);
 			counter++;
+			soucet+=db[i].hodnota;
 		}
 	}
-	printf("Celkem nalezeno %d zaznamu.\n", counter);
+	for(int z=1;z<=58;z++){if(vypis) printf("-");}if(vypis)printf("\n");
+	if(counter == 0){
+		if(vypis) printf("Zadanemu filtru neodpovida zadny zaznam.\n");
+	} else {
+		if(vypis) printf("Celkem nalezeno %d zaznamu.\n\n", counter);
+	}
+	// vypocet prumeru
+	int prumer = soucet / counter;
+	(*stat).soucet = soucet;
+	stat->prumer = prumer;
+}
+
+void analyzaCovidu1(Zaznam * databaze, int vel){
+	char kat[D_TEXT] = "celkem";
+	char dat1[D_TEXT] = "2011-01-01";
+	char dat2[D_TEXT] = "2019-12-31";
+	Statistiky s2, s3;
+	// krok 1 - zjistim prumer v letech bez covidu
+	filtr(databaze, vel, kat, dat1, dat2, 0, &s2);
+	int prumerBezCovidu = s2.soucet / 9;
+	printf("Prumerny pocet zemrelych za 1 rok bez covidu je %d\n", prumerBezCovidu);
+
+	// krok 2 - zjistim soucet za roky 2020 - 2022
+	filtr(databaze, vel, kat, "2020-01-01", "2022-12-31", 0, &s3);
+	int soucetBehemCovidu = s3.soucet;
+	printf("Soucet zemrelych za roky 2020-2022 je %d\n", soucetBehemCovidu);
+
+	// krok 3 - zjistim pocet zemrelych navic
+	int zemreliNavic = soucetBehemCovidu - 3*prumerBezCovidu;
+	printf("Pocet mrtvych navic behem covidu: %d\n\n", zemreliNavic);
 }
 
 // parametry 
@@ -41,16 +92,30 @@ void filtr( Zaznam * db, int vel, char * kat, char * dat1, char * dat2){
 void obsluhaUzivatele(Zaznam * databaze, int velikost){
 
 	char vstup;
+	Statistiky s1;
+	char kat[D_TEXT]; char dat1[D_TEXT]; char dat2[D_TEXT];
 	while(1){
 		printf("Zadejte volbu: \n");
 		printf(" F <kategorie> <od> <do>: Filtruje kategorii od data do data \n");
+		printf(" S <kategorie> <od> <do>: Soucet v kategorii od data do data \n");
+		printf(" P <kategorie> <od> <do>: Prumer v kategorii od data do data \n");
+		printf(" A - analyzaCovidu1");
 		printf(" K: Ukonci program\n");
 		scanf("%c", &vstup);
 		if(vstup == 'F'){
-			char kat[D_TEXT]; char dat1[D_TEXT]; char dat2[D_TEXT];
 			scanf("%s %s %s", kat, dat1, dat2);
-			filtr(databaze, velikost, kat, dat1, dat2);
-		} else if(vstup == 'K'){
+			filtr(databaze, velikost, kat, dat1, dat2, 1, &s1);
+		} else if(vstup == 'S'){
+			scanf("%s %s %s", kat, dat1, dat2);
+			filtr(databaze, velikost, kat, dat1, dat2, 0, &s1);
+			printf("Celkovy pocet zemrelych: %d\n\n", s1.soucet);
+		} else if(vstup == 'P'){
+			scanf("%s %s %s", kat, dat1, dat2);
+			filtr(databaze, velikost, kat, dat1, dat2, 0, &s1);
+			printf("Prumerny pocet zemrelych: %d\n\n", s1.prumer);
+		} else if(vstup == 'A'){
+			analyzaCovidu1(databaze, velikost);
+		} else if (vstup == 'K'){
 			break;
 		} else { // chyba
 			printf("Toto neni platny vstup.\n");
