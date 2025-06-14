@@ -86,6 +86,36 @@ void analyzaCovidu1(Zaznam * databaze, int vel){
 	printf("Pocet mrtvych navic behem covidu: %d\n\n", zemreliNavic);
 }
 
+int pocetDnuOdPocatku(int rok, int mesic, int den){
+
+	int pocet = 0;
+	int dnyVMesici[12] = {31,28,31,30,31,30,31,31,30,31,30,31};
+
+	pocet += rok*365;
+	for(int i = 0; i < mesic-1; i++){
+		pocet+=dnyVMesici[i];
+	}
+
+	pocet+=den;
+	return pocet;
+}
+
+// funkce vraci pocet let mezi 2 datumy jako float
+float pocetLetMeziDatumy(char * dat1, char * dat2){
+	int r1, r2;
+	int m1, m2;
+	int d1, d2;
+
+	sscanf(dat1, "%d-%d-%d", &r1, &m1, &d1);
+	sscanf(dat2, "%d-%d-%d", &r2, &m2, &d2);
+
+	int poc1 = pocetDnuOdPocatku(r1, m1, d1);
+	int poc2 = pocetDnuOdPocatku(r2, m2, d2);
+
+	float vystup = (float)((poc2-poc1)/365.0);
+	return vystup;
+}
+
 // parametry 
 // databaze - ukazatel na databazi
 // velikost - velikost databaze (pocet prvku)
@@ -96,6 +126,7 @@ void obsluhaUzivatele(Zaznam * databaze, int velikost){
 	char kat[D_TEXT]; char dat1[D_TEXT]; char dat2[D_TEXT];
 	while(1){
 		printf("Zadejte volbu: \n");
+		printf(" D <od> <do>:             Pocet let mezi 2 datumy.\n");
 		printf(" F <kategorie> <od> <do>: Filtruje kategorii od data do data \n");
 		printf(" S <kategorie> <od> <do>: Soucet v kategorii od data do data \n");
 		printf(" P <kategorie> <od> <do>: Prumer v kategorii od data do data \n");
@@ -115,6 +146,10 @@ void obsluhaUzivatele(Zaznam * databaze, int velikost){
 			printf("Prumerny pocet zemrelych: %d\n\n", s1.prumer);
 		} else if(vstup == 'A'){
 			analyzaCovidu1(databaze, velikost);
+		} else if(vstup == 'D') {
+			scanf("%s %s", dat1, dat2);
+			float p1 = pocetLetMeziDatumy(dat1, dat2);
+			printf("Pocet let mezi datumy %s a %s je %f.\n", dat1, dat2, p1);
 		} else if (vstup == 'K'){
 			break;
 		} else { // chyba
